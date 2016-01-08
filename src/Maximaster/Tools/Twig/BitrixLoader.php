@@ -1,6 +1,6 @@
 <?php
 
-namespace Maximaster\Twig;
+namespace Maximaster\Tools\Twig;
 
 /**
  * Class BitrixLoader. Класс загрузчик файлов шаблонов. Понимает специализированный синтаксис

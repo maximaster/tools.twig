@@ -1,6 +1,6 @@
 <?php
 
-namespace Maximaster\Twig;
+namespace Maximaster\Tools\Twig;
 
 /**
  * Class BitrixExtension. Расширение, которое позволяет в шаблонах использовать типичные для битрикса конструкции

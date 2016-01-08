@@ -1,6 +1,6 @@
 <?php
 
-namespace Maximaster\Twig;
+namespace Maximaster\Tools\Twig;
 
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
