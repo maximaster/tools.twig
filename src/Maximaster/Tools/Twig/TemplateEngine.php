@@ -2,6 +2,8 @@
 
 namespace Maximaster\Tools\Twig;
 
+use Bitrix\Main\Config\Configuration;
+
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
  * одному и тому же рендереру страниц
@@ -15,23 +17,24 @@ class TemplateEngine
     {
         if (self::$instance) return self::$instance;
 
-        $isDebug = false;
-
         //\Twig_Autoloader::register();
         $loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
 
-        $cachePath = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/twig';
+        $c = Configuration::getInstance();
+        $config = $c->get('maximaster');
+        $twigConfig = $config['tools']['twig'];
+
+        $defaultCachePath = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig';
+        $cachePath = isset($twigConfig['cache']) ? $twigConfig['cache'] : $defaultCachePath;
+        $autoescape = isset($twigConfig['autoescape']) ? $twigConfig['autoescape'] : false;
+        $isDebug = $twigConfig['debug'] === true ? true : false;
 
         $twigOptions = array(
             'cache' => $cachePath,
             'charset' => SITE_CHARSET,
-            'autoescape' => false,
+            'autoescape' => $autoescape,
+            'debug' => $isDebug
         );
-
-        if ($isDebug)
-        {
-            $twigOptions['debug'] = true;
-        }
 
         $twig = new \Twig_Environment($loader, $twigOptions);
 
