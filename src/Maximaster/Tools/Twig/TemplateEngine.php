@@ -23,25 +23,19 @@ class TemplateEngine
         $config = $c->get('maximaster');
         $twigConfig = $config['tools']['twig'];
 
-        $defaultCachePath = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig';
-        $cachePath = isset($twigConfig['cache']) ? $twigConfig['cache'] : $defaultCachePath;
-        $autoescape = isset($twigConfig['autoescape']) ? $twigConfig['autoescape'] : false;
-        $isDebug = $twigConfig['debug'] === true ? true : false;
-        $autoReload = isset( $_GET[ "clear_cache" ] ) && strtoupper($_GET[ "clear_cache" ]) == "Y" ?
-            true : $twigConfig['auto_reload'] === true;
-
-
-        $twigOptions = array(
-            'cache' => $cachePath,
+        $defaultConfig = array(
+            'debug' => false,
             'charset' => SITE_CHARSET,
-            'autoescape' => $autoescape,
-            'debug' => $isDebug,
-            'auto_reload' => $autoReload
+            'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
+            'auto_reload' => isset( $_GET[ 'clear_cache' ] ) && strtoupper($_GET[ 'clear_cache' ]) == 'Y',
+            'autoescape' => false
         );
+
+        $twigOptions = array_merge($defaultConfig, $twigConfig);
 
         $twig = new \Twig_Environment($loader, $twigOptions);
 
-        if ($isDebug)
+        if ($twig->isDebug())
         {
             $twig->addExtension(new \Twig_Extension_Debug());
         }
