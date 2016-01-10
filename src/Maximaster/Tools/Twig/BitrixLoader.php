@@ -37,9 +37,13 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
         return $name;
     }
 
+    /**
+     * Не использовать в продакшене!!
+     * Метод используется только в режиме разработки или при использовании опции auto_reload = true
+     */
     function isFresh($name, $time)
     {
-        return (time() - $time) > 86400;
+        return filemtime($this->getSource($name)) <= $time;
     }
 
     private function componentTemplate($name)

@@ -35,7 +35,8 @@ vendor:component_name[:template[:specific_template_file]]
             'twig' => array(
                 'debug' => false,
                 'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
-                'autoescape' => false
+                'autoescape' => false,
+                'auto_reload' => true,
             )
         )
     )

@@ -27,12 +27,16 @@ class TemplateEngine
         $cachePath = isset($twigConfig['cache']) ? $twigConfig['cache'] : $defaultCachePath;
         $autoescape = isset($twigConfig['autoescape']) ? $twigConfig['autoescape'] : false;
         $isDebug = $twigConfig['debug'] === true ? true : false;
+        $autoReload = isset( $_GET[ "clear_cache" ] ) && strtoupper($_GET[ "clear_cache" ]) == "Y" ?
+            true : $twigConfig['auto_reload'] === true;
+
 
         $twigOptions = array(
             'cache' => $cachePath,
             'charset' => SITE_CHARSET,
             'autoescape' => $autoescape,
-            'debug' => $isDebug
+            'debug' => $isDebug,
+            'auto_reload' => $autoReload
         );
 
         $twig = new \Twig_Environment($loader, $twigOptions);
