@@ -3,7 +3,6 @@
   "description": "Модуль подключения шаблонизатора twig к битриксу",
   "keywords": ["bitrix", "1С Битрикс", "максимастер", "twig", "шаблонизатор"],
   "license": "MIT",
-  "version": "0.3",
   "support": {
     "www": "http://www.maximaster.ru",
     "source": "https://github.com/maximaster/tools.twig.git"
