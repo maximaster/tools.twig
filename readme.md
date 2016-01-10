@@ -24,7 +24,7 @@ vendor:component_name[:template[:specific_template_file]]
 
 ## Управление настройками
 
-Библиотека конфигурируется с помощью файла /bitrix/.settings.php. Нужно завести в этом файле опцию maximaster, и оперировать значением tools->twig. Ниже описаны все возможные конфиги с их дефолтными значениями:
+Библиотека конфигурируется с помощью файла /bitrix/.settings.php. Нужно завести в этом файле опцию maximaster, и оперировать значением tools->twig. Ниже описаны значения опций, которые заданы библиотекой по-умолчанию:
 
 ```php
 
@@ -56,4 +56,4 @@ vendor:component_name[:template[:specific_template_file]]
 //...
 
 ```
-При выборе значений для конфигов нужно опираться на [документацию twig по настройкам Twig_Environment](http://twig.sensiolabs.org/doc/api.html#environment-options) 
+При выборе значений для конфигов нужно опираться на [документацию twig по настройкам Twig_Environment](http://twig.sensiolabs.org/doc/api.html#environment-options). Поддерживаются все возможные согласно этой документации опции
