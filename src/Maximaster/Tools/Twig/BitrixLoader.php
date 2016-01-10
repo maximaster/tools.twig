@@ -24,7 +24,7 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
         }*/
 
         $realFileName = $_SERVER[ 'DOCUMENT_ROOT' ] . $name;
-        if ($realFileName)
+        if (file_exists($realFileName))
         {
             return file_get_contents($realFileName);
         }

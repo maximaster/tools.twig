@@ -17,7 +17,6 @@ class TemplateEngine
     {
         if (self::$instance) return self::$instance;
 
-        //\Twig_Autoloader::register();
         $loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
 
         $c = Configuration::getInstance();
