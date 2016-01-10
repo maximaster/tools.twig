@@ -21,7 +21,7 @@ class TemplateEngine
 
         $c = Configuration::getInstance();
         $config = $c->get('maximaster');
-        $twigConfig = $config['tools']['twig'];
+        $twigConfig = (array)$config['tools']['twig'];
 
         $defaultConfig = array(
             'debug' => false,
