@@ -3,10 +3,10 @@
 use Maximaster\Tools\Twig\TemplateEngine;
 
 global $arCustomTemplateEngines;
-$arCustomTemplateEngines['twig'] = [
-    'templateExt' => ['twig'],
+$arCustomTemplateEngines['twig'] = array(
+    'templateExt' => array('twig'),
     'function'    => 'maximasterRnderTwigTemplate'
-];
+);
 if (!function_exists('maximasterRnderTwigTemplate'))
 {
     function maximasterRnderTwigTemplate(
@@ -31,5 +31,5 @@ if (!function_exists('maximasterRnderTwigTemplate'))
 }
 else
 {
-    throw new \Twig_Error_Loader('Необходимо, чтобы функия с именем maximasterRnderTwigTemplate не была определена');
+    throw new \Twig_Error_Loader('РќРµРѕР±С…РѕРґРёРјРѕ, С‡С‚РѕР±С‹ С„СѓРЅРєРёСЏ СЃ РёРјРµРЅРµРј maximasterRnderTwigTemplate РЅРµ Р±С‹Р»Р° РѕРїСЂРµРґРµР»РµРЅР°');
 }
