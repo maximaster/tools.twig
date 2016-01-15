@@ -3,6 +3,7 @@
 namespace Maximaster\Tools\Twig;
 
 use Bitrix\Main\Config\Configuration;
+use Bitrix\Main\Event;
 
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
@@ -42,6 +43,19 @@ class TemplateEngine
 
         $twig->addExtension(new BitrixExtension());
         $twig->addExtension(new CustomFunctionsExtension());
+
+        $event = new Event('', 'onAfterTwigTemplateEngineInited', array($twig));
+        $event->send();
+        if ($event->getResults())
+        {
+            foreach($event->getResults() as $evenResult)
+            {
+                if($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS)
+                {
+                    $twig = current($evenResult->getParameters());
+                }
+            }
+        }
 
         return self::$instance = $twig;
     }
