@@ -61,7 +61,7 @@ vendor:component_name[:template[:specific_template_file]]
 ## Расширение 
 
 С версии 0.5 появилась возможность добавления собственных расширений. Реализуется это с помощью обработчика события **onAfterTwigTemplateEngineInited**. Событие не привязано ни к одному из модулей, поэтому при регистрации события в качестве идентификатора модуля нужно указать пустую строку.
-В событие передается объект \Maximaster\Tools\Twig\TemplateEngine, с которым можно сделать определенные манипуляции.
+В событие передается объект \Twig_Environment, с которым можно сделать определенные манипуляции.
 Пример обработчика события, который зарегистрирует свое расширение:
 
 ```php
@@ -70,7 +70,7 @@ use Bitrix\Main\EventResult;
 
 class onAfterTwigTemplateEngineCreated
 {
-    public static function addTwigExtension($engine)
+    public static function addTwigExtension(\Twig_Environment $engine)
     {
         $engine->addExtension(new MySuperDuperExtension());
         return new EventResult(EventResult::SUCCESS, array($engine));
