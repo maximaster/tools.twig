@@ -36,13 +36,13 @@ class BitrixExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return [
+        return array(
             new \Twig_SimpleFunction('showError', 'ShowError'),
             new \Twig_SimpleFunction('showMessage', 'ShowMessage'),
             new \Twig_SimpleFunction('showNote', 'ShowNote'),
             new \Twig_SimpleFunction('bitrix_sessid_post', 'bitrix_sessid_post'),
             new \Twig_SimpleFunction('bitrix_sessid_get', 'bitrix_sessid_get'),
             new \Twig_SimpleFunction('getMessage', 'GetMessage'),
-        ];
+        );
     }
 }
