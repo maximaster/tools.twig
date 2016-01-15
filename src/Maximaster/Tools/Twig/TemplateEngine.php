@@ -41,6 +41,7 @@ class TemplateEngine
         }
 
         $twig->addExtension(new BitrixExtension());
+        $twig->addExtension(new CustomFunctionsExtension());
 
         return self::$instance = $twig;
     }
