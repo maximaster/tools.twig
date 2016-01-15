@@ -57,3 +57,36 @@ vendor:component_name[:template[:specific_template_file]]
 
 ```
 При выборе значений для конфигов нужно опираться на [документацию twig по настройкам Twig_Environment](http://twig.sensiolabs.org/doc/api.html#environment-options). Поддерживаются все возможные согласно этой документации опции
+
+
+С версии 0.5 появилась возможность добавления собственных расширений. Реализуется это с помощью обработчика события onAfterTwigTemplateEngineInited. Событие не привязано ни к одному из модулей, поэтому при регистрации события в качестве идентификатора модуля нужно указать пустую строку.
+В событие передается объект \Maximaster\Tools\Twig\TemplateEngine, с которым можно сделать определенные манипуляции.
+Пример обработчика события, который зарегистрирует свое расширение:
+
+```php
+
+use Bitrix\Main\EventResult;
+
+class onAfterTwigTemplateEngineCreated
+{
+    public static function addTwigExtension($engine)
+    {
+        $engine->addExtension(new MySuperDuperExtension());
+        return new EventResult(EventResult::SUCCESS, array($engine));
+    }
+}
+```
+
+Здесь класс MySuperDuperExtension должен быть наследником класса \Twig_Extension или имплементацией интерфейса \Twig_ExtensionInterface.
+
+С версии 0.5 в библиотеке появились дополнительные удобные функции для работы с шаблонами. На данный момент функция только одна, но их перечень постоянно будет пополняться.
+
+###### russianPluralForm(int $num, array $words)
+Функция помогает в выводе множественного числа для русских слов. К примеру, вам нужно вывести строку "21 билет". Для этого нужно воспользоваться функцией с такими параметрами в twig:
+
+```twig
+    {% set ticketsCount = 21 %}
+    {{ russianPluralForm(ticketsCount, ['билетов', 'билет', 'билета']) }}
+```
+
+Порядок словоформ запомнить достаточно просто: 0 билетов, 1 билет, 2 билета. Для большинства слов такой порядок будет работать корректно.
