@@ -18,19 +18,22 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
      */
     function getSource($name)
     {
-        /*if ($name == SITE_TEMPLATE_ID)
-        {
-            return $this->siteTemplate();
-        }*/
-
-        $realFileName = $_SERVER[ 'DOCUMENT_ROOT' ] . $name;
-        if (file_exists($realFileName))
-        {
-            return file_get_contents($realFileName);
-        }
-
-        return $this->componentTemplate($name);
+		return file_get_contents($this->getSourcePath($name));
     }
+
+	function getSourcePath($name)
+	{
+		/*if ($name == SITE_TEMPLATE_ID)
+		{
+			return $this->siteTemplate();
+		}*/
+
+		$realFileName = $_SERVER[ 'DOCUMENT_ROOT' ] . $name;
+		if (file_exists($realFileName))
+			return $realFileName;
+
+		return $this->getComponentTemplatePath($name);
+	}
 
     function getCacheKey($name)
     {
@@ -40,13 +43,23 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
     /**
      * Не использовать в продакшене!!
      * Метод используется только в режиме разработки или при использовании опции auto_reload = true
+	 * @param string $name Путь к шаблону
+	 * @param int $time Время изменения закешированного шаблона
+	 * @return bool Актуален ли закешированный шаблон
      */
     function isFresh($name, $time)
     {
-        return filemtime($this->getSource($name)) <= $time;
+        return filemtime($this->getSourcePath($name)) <= $time;
     }
 
-    private function componentTemplate($name)
+	/**
+	 * По Битрикс-имени шаблона возвращает путь к его файлу
+	 *
+	 * @param string $name
+	 * @return string
+	 * @throws \Twig_Error_Loader
+	 */
+    private function getComponentTemplatePath($name)
     {
         list($namespace, $component, $template, $file) = explode(':', $name);
 
@@ -74,7 +87,7 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
             throw new \Twig_Error_Loader("Не удалось найти шаблон '{$name}'");
         }
 
-        return file_get_contents($templatePath);
+        return $templatePath;
     }
 
     /*

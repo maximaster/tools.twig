@@ -33,22 +33,20 @@ vendor:component_name[:template[:specific_template_file]]
     'value' => array(
         'tools' => array(
             'twig' => array(
-                array(
-                    // Режим отладки выключен
-                    'debug' => false,
-                    
-                    //Кодировка соответствует кодировке продукта
-                    'charset' => SITE_CHARSET,
-                    
-                    //кеш хранится в уникальной директории
-                    'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
-                    
-                    //Автообновление включается только в момент очистки кеша
-                    'auto_reload' => isset( $_GET[ 'clear_cache' ] ) && strtoupper($_GET[ 'clear_cache' ]) == 'Y',
-                    
-                    //Автоэскейп отключен, т.к. битрикс по-умолчанию его сам делает
-                    'autoescape' => false,
-                )
+				// Режим отладки выключен
+				'debug' => false,
+
+				//Кодировка соответствует кодировке продукта
+				'charset' => SITE_CHARSET,
+
+				//кеш хранится в уникальной директории
+				'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
+
+				//Автообновление включается только в момент очистки кеша
+				'auto_reload' => isset( $_GET[ 'clear_cache' ] ) && strtoupper($_GET[ 'clear_cache' ]) == 'Y',
+
+				//Автоэскейп отключен, т.к. битрикс по-умолчанию его сам делает
+				'autoescape' => false,
             )
         )
     )
