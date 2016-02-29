@@ -77,9 +77,10 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
 
         $component = new \CBitrixComponent();
         $component->InitComponent($componentName, $template);
+		$component->__templatePage = $file;
 
         $obTemplate = new \CBitrixComponentTemplate();
-        $obTemplate->Init($component, false, $file);
+        $obTemplate->Init($component);
         $templatePath = $_SERVER['DOCUMENT_ROOT'] . $obTemplate->GetFile();
 
         if (!file_exists($templatePath))

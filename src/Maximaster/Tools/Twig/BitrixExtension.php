@@ -43,6 +43,20 @@ class BitrixExtension extends \Twig_Extension
             new \Twig_SimpleFunction('bitrix_sessid_post', 'bitrix_sessid_post'),
             new \Twig_SimpleFunction('bitrix_sessid_get', 'bitrix_sessid_get'),
             new \Twig_SimpleFunction('getMessage', 'GetMessage'),
+            new \Twig_SimpleFunction('showComponent', array(__CLASS__, 'showComponent')),
         );
+    }
+
+    /**
+     * @param string $componentName
+     * @param string $componentTemplate
+     * @param array $arParams
+     * @param \CBitrixComponent $parentComponent
+     * @param array $arFunctionParams
+     */
+    public static function showComponent($componentName, $componentTemplate, $arParams = array(), $parentComponent = null, $arFunctionParams = array())
+    {
+        global $APPLICATION;
+        $APPLICATION->IncludeComponent($componentName, $componentTemplate, $arParams, $parentComponent, $arFunctionParams);
     }
 }
