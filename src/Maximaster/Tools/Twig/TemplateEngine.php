@@ -64,13 +64,13 @@ class TemplateEngine
      * Собственно сама функция - рендерер. Принимает все данные о шаблоне и компоненте, выводит в stdout данные.
      * Содержит дополнительную обработку для component_epilog.php
      *
-     * @param $templateFile
-     * @param $arResult
-     * @param $arParams
-     * @param $arLangMessages
-     * @param $templateFolder
-     * @param $parentTemplateFolder
-     * @param $template
+     * @param string $templateFile
+     * @param array $arResult
+     * @param array $arParams
+     * @param array $arLangMessages
+     * @param string $templateFolder
+     * @param string $parentTemplateFolder
+     * @param \CBitrixComponentTemplate $template
      * @throws \Twig_Error
      */
     public static function render(
@@ -88,11 +88,14 @@ class TemplateEngine
             throw new \Twig_Error('Пролог не подключен');
         }
 
+        $component = $template->__component;
+
         echo self::getInstance()->render($templateFile, array(
             'result' => $arResult,
             'params' => $arParams,
             'lang' => $arLangMessages,
             'template' => $template,
+            'component' => $component,
             'templateFolder' => $templateFolder,
             'parentTemplateFolder' => $parentTemplateFolder
         ));
@@ -100,7 +103,6 @@ class TemplateEngine
         $component_epilog = $templateFolder . '/component_epilog.php';
         if(file_exists($_SERVER['DOCUMENT_ROOT'] . $component_epilog))
         {
-            $component = $template->__component;
             /** @var \CBitrixComponent $component */
             $component->SetTemplateEpilog(array(
                 'epilogFile' => $component_epilog,
