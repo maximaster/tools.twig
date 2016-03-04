@@ -90,7 +90,7 @@ class TemplateEngine
 
         $component = $template->__component;
 
-        echo self::getInstance()->render($templateFile, array(
+        echo self::getInstance()->render($template->__fileAlt ?: $templateFile, array(
             'result' => $arResult,
             'params' => $arParams,
             'lang' => $arLangMessages,
