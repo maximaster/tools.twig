@@ -14,25 +14,41 @@ class TemplateEngine
 {
     private static $instance = null;
 
-    private static function getInstance()
+    /**
+     * Очищает весь кеш твига
+     */
+    public static function clearAllCache()
     {
-        if (self::$instance) return self::$instance;
+        self::getInstance()->clearCacheFiles();
+    }
 
-        $loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
-
-        $c = Configuration::getInstance();
-        $config = $c->get('maximaster');
-        $twigConfig = (array)$config['tools']['twig'];
-
-        $defaultConfig = array(
+    private static function getDefaultOptions()
+    {
+        return array(
             'debug' => false,
             'charset' => SITE_CHARSET,
             'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
             'auto_reload' => isset( $_GET[ 'clear_cache' ] ) && strtoupper($_GET[ 'clear_cache' ]) == 'Y',
             'autoescape' => false
         );
+    }
 
-        $twigOptions = array_merge($defaultConfig, $twigConfig);
+    private static function getOptions()
+    {
+        $c = Configuration::getInstance();
+        $config = $c->get('maximaster');
+        $twigConfig = (array)$config['tools']['twig'];
+
+        return array_merge(self::getDefaultOptions(), $twigConfig);
+    }
+
+    private static function getInstance()
+    {
+        if (self::$instance) return self::$instance;
+
+        $loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
+
+        $twigOptions = self::getOptions();
 
         $twig = new \Twig_Environment($loader, $twigOptions);
 
