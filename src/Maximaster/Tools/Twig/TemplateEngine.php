@@ -4,6 +4,7 @@ namespace Maximaster\Tools\Twig;
 
 use Bitrix\Main\Config\Configuration;
 use Bitrix\Main\Event;
+use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
@@ -12,68 +13,94 @@ use Bitrix\Main\Event;
  */
 class TemplateEngine
 {
+    /**
+     * @var \Twig_Environment
+     */
+    private $engine;
+
+    /**
+     * Возвращает настроенный инстанс движка Twig
+     * @return \Twig_Environment
+     */
+    public function getEngine()
+    {
+        return $this->engine;
+    }
+
     private static $instance = null;
 
     /**
      * Очищает весь кеш твига
+     *
+     * @deprecated начиная с 0.8. Будет удален в 1.0
      */
     public static function clearAllCache()
     {
-        self::getInstance()->clearCacheFiles();
+        $cleaner = new TwigCacheCleaner(self::getInstance()->getEngine());
+        return $cleaner->clearAll();
     }
 
-    private static function getDefaultOptions()
+    public function __construct()
     {
-        return array(
-            'debug' => false,
-            'charset' => SITE_CHARSET,
-            'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
-            'auto_reload' => isset( $_GET[ 'clear_cache' ] ) && strtoupper($_GET[ 'clear_cache' ]) == 'Y',
-            'autoescape' => false
+        $optionsStorage = new TwigOptionsStorage();
+        $this->engine = new \Twig_Environment(
+            new BitrixLoader($_SERVER['DOCUMENT_ROOT']),
+            $optionsStorage->asArray()
         );
+
+        $this->initExtensions();
+        $this->generateInitEvent();
+
+        self::$instance = $this;
     }
 
-    private static function getOptions()
+    /**
+     * Инициализируется расширения, необходимые для работы
+     */
+    private function initExtensions()
     {
-        $c = Configuration::getInstance();
-        $config = $c->get('maximaster');
-        $twigConfig = (array)$config['tools']['twig'];
-
-        return array_merge(self::getDefaultOptions(), $twigConfig);
-    }
-
-    private static function getInstance()
-    {
-        if (self::$instance) return self::$instance;
-
-        $loader = new BitrixLoader($_SERVER['DOCUMENT_ROOT']);
-
-        $twigOptions = self::getOptions();
-
-        $twig = new \Twig_Environment($loader, $twigOptions);
-
-        if ($twig->isDebug())
-        {
-            $twig->addExtension(new \Twig_Extension_Debug());
+        if ($this->engine->isDebug()) {
+            $this->engine->addExtension(new \Twig_Extension_Debug());
         }
 
-        $twig->addExtension(new BitrixExtension());
-        $twig->addExtension(new CustomFunctionsExtension());
+        $this->engine->addExtension(new BitrixExtension());
+        $this->engine->addExtension(new CustomFunctionsExtension());
+    }
 
-        $event = new Event('', 'onAfterTwigTemplateEngineInited', array($twig));
+    /**
+     * Создается событие для внесения в Twig изменения из проекта
+     */
+    private function generateInitEvent()
+    {
+        $eventName = 'onAfterTwigTemplateEngineInited';
+        $event = new Event('', $eventName, array($this->engine));
         $event->send();
-        if ($event->getResults())
-        {
-            foreach($event->getResults() as $evenResult)
-            {
-                if($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS)
-                {
+        if ($event->getResults()) {
+
+            foreach($event->getResults() as $evenResult) {
+
+                if($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS) {
+
                     $twig = current($evenResult->getParameters());
+
+                    if (!($twig instanceof \Twig_Environment)) {
+
+                        throw new \LogicException(
+                            "Событие '{$eventName}' должно возвращать экземпляр класса '\\Twig_Environment' при успешной отработке"
+                        );
+
+                    }
+
+                    $this->engine = $twig;
                 }
             }
         }
+    }
 
-        return self::$instance = $twig;
+    public static function getInstance()
+    {
+        if (self::$instance) return self::$instance;
+        return self::$instance = new self();
     }
 
     /**
@@ -99,14 +126,21 @@ class TemplateEngine
         $template
     )
     {
-        if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)
-        {
+        if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
+
             throw new \Twig_Error('Пролог не подключен');
+
         }
 
         $component = $template->__component;
+        /** @var BitrixLoader $loader */
+        $loader = self::getInstance()->getEngine()->getLoader();
+        if (!($loader instanceof BitrixLoader)) {
+            throw new \LogicException("Загрузчиком должен быть 'Maximaster\\Tools\\Twig\\BitrixLoader' или его наследник");
+        }
 
-        echo self::getInstance()->render($template->__fileAlt ?: $templateFile, array(
+        $templateName = $loader->makeComponentTemplateName($template);
+        echo self::getInstance()->getEngine()->render($templateName, array(
             'result' => $arResult,
             'params' => $arParams,
             'lang' => $arLangMessages,

@@ -5,11 +5,11 @@ use Maximaster\Tools\Twig\TemplateEngine;
 global $arCustomTemplateEngines;
 $arCustomTemplateEngines['twig'] = array(
     'templateExt' => array('twig'),
-    'function'    => 'maximasterRnderTwigTemplate'
+    'function'    => 'maximasterRenderTwigTemplate'
 );
-if (!function_exists('maximasterRnderTwigTemplate'))
+if (!function_exists('maximasterRenderTwigTemplate'))
 {
-    function maximasterRnderTwigTemplate(
+    function maximasterRenderTwigTemplate(
         $templateFile,
         $arResult,
         $arParams,
@@ -31,5 +31,5 @@ if (!function_exists('maximasterRnderTwigTemplate'))
 }
 else
 {
-    throw new \Twig_Error_Loader('Необходимо, чтобы функия с именем maximasterRnderTwigTemplate не была определена');
+    throw new \Twig_Error_Loader('Необходимо, чтобы функция с именем maximasterRenderTwigTemplate не была определена');
 }

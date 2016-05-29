@@ -39,7 +39,7 @@ vendor:component_name[:template[:specific_template_file]]
 				//Кодировка соответствует кодировке продукта
 				'charset' => SITE_CHARSET,
 
-				//кеш хранится в уникальной директории
+				//кеш хранится в уникальной директории. Должен быть полный абсолютный путь
 				'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
 
 				//Автообновление включается только в момент очистки кеша
@@ -59,12 +59,14 @@ vendor:component_name[:template[:specific_template_file]]
 ## Расширение 
 
 С версии 0.5 появилась возможность добавления собственных расширений. Реализуется это с помощью обработчика события **onAfterTwigTemplateEngineInited**. Событие не привязано ни к одному из модулей, поэтому при регистрации события в качестве идентификатора модуля нужно указать пустую строку.
-В событие передается объект \Twig_Environment, с которым можно сделать определенные манипуляции.
+В событие передается объект `\Twig_Environment`, с которым можно сделать определенные манипуляции.
 Пример обработчика события, который зарегистрирует свое расширение:
 
 ```php
 
 use Bitrix\Main\EventResult;
+
+AddEventHandler('', 'onAfterTwigTemplateEngineInited', array('onAfterTwigTemplateEngineInited', 'addTwigExtension'));
 
 class onAfterTwigTemplateEngineCreated
 {
@@ -76,7 +78,7 @@ class onAfterTwigTemplateEngineCreated
 }
 ```
 
-Здесь класс MySuperDuperExtension должен быть наследником класса \Twig_Extension или имплементацией интерфейса \Twig_ExtensionInterface.
+Здесь класс MySuperDuperExtension должен быть наследником класса `\Twig_Extension` или имплементацией интерфейса `\Twig_ExtensionInterface`.
 
 ## Дополнительные функции
 
@@ -91,3 +93,11 @@ class onAfterTwigTemplateEngineCreated
 ```
 
 Порядок словоформ запомнить достаточно просто: 0 билетов, 1 билет, 2 билета. Для большинства слов такой порядок будет работать корректно.
+
+## Работа с кешем
+
+С версии 0.8 появилась возможность программно управлять очисткой кеша. Сделать это можно с помощью класса `\Maximaster\Tools\Twig\TwigCacheCleaner`. Данный класс можно использовать только в том случае, если кеш Twig хранится на диске. 
+Класс имеет 2 метода очистки:
+* `clearByName($name)` - очищает кеш шаблона по его имени 
+* `clearAll()` - очищает весь кеш
+Каждый их методов вернет количество удаленных файлов кеша
