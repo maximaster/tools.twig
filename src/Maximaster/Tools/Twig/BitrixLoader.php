@@ -24,7 +24,7 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
      */
     public function getSource($name)
     {
-        return file_get_contents($this->getSourcePath($this->normalizeName($name)));
+        return file_get_contents($this->getSourcePath($name));
     }
 
     /** {@inheritdoc} */
@@ -43,7 +43,7 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
      */
     public function isFresh($name, $time)
     {
-        return filemtime($this->getSource($name)) <= $time;
+        return filemtime($this->getSourcePath($name)) <= $time;
     }
 
     /**
@@ -55,6 +55,8 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
      */
     public function getSourcePath($name)
     {
+        $name = $this->normalizeName($name);
+        
         if (isset(static::$resolved[ $name ])) {
             return static::$resolved[ $name ];
         }
