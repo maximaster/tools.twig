@@ -120,7 +120,7 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
 
         $templatePage = $template->__page;
         $templateName = $template->__name;
-        $componentName = $template->getComponent()->getName();
+        $componentName = $template->__component->getName();
 
         return "{$componentName}:{$templateName}:{$templatePage}";
     }
