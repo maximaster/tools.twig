@@ -27,6 +27,11 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
         return file_get_contents($this->getSourcePath($name));
     }
 
+    protected function findTemplate($name)
+    {
+        return $this->getSourcePath($name);
+    }
+
     /** {@inheritdoc} */
     public function getCacheKey($name)
     {
