@@ -64,6 +64,7 @@ class TemplateEngine
         }
 
         $this->engine->addExtension(new BitrixExtension());
+        $this->engine->addExtension(new PhpGlobalsExtension());
         $this->engine->addExtension(new CustomFunctionsExtension());
     }
 
