@@ -13,9 +13,9 @@
 
 ## Документация 
 
-**[Синтаксис подключения шаблонов](docs/syntax.md)**
-**[Доступные переменные и функции внутри шаблонов](docs/twig_extensions.md)**
-**[Конфигурирование](docs/configuration.md)**
-**[Работа с кешем](docs/workinkg_with_cache.md)**
-**[Расширение возможностей](docs/extend.md)**
-**[Тонкости интеграции с битриксом](docs/bitrix_pitfalls.md)**
+* **[Синтаксис подключения шаблонов](docs/syntax.md)**
+* **[Доступные переменные и функции внутри шаблонов](docs/twig_extension.md)**
+* **[Конфигурирование](docs/configuration.md)**
+* **[Работа с кешем](docs/working_with_cache.md)**
+* **[Расширение возможностей](docs/extend.md)**
+* **[Тонкости интеграции с битриксом](docs/bitrix_pitfalls.md)**
