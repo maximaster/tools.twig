@@ -3,6 +3,7 @@
 namespace Maximaster\Tools\Twig;
 
 use Bitrix\Main\Application;
+use Bitrix\Main\Localization\Loc;
 
 /**
  * Class BitrixExtension. Расширение, которое позволяет в шаблонах использовать типичные для битрикса конструкции
@@ -55,7 +56,7 @@ class BitrixExtension extends \Twig_Extension
             new \Twig_SimpleFunction('showNote', 'ShowNote'),
             new \Twig_SimpleFunction('bitrix_sessid_post', 'bitrix_sessid_post'),
             new \Twig_SimpleFunction('bitrix_sessid_get', 'bitrix_sessid_get'),
-            new \Twig_SimpleFunction('getMessage', $this->isD7() ? '\Bitrix\Main\Loc::getMessage' : 'GetMessage'),
+            new \Twig_SimpleFunction('getMessage', $this->isD7() ? '\\Bitrix\\Main\\Localization\\Loc::getMessage' : 'GetMessage'),
             new \Twig_SimpleFunction('showComponent', array(__CLASS__, 'showComponent')),
         );
     }
