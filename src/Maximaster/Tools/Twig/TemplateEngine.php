@@ -5,6 +5,7 @@ namespace Maximaster\Tools\Twig;
 use Bitrix\Main\Config\Configuration;
 use Bitrix\Main\Event;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
+use CBitrixComponentTemplate;
 
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
@@ -19,8 +20,13 @@ class TemplateEngine
     private $engine;
 
     /**
+     * @var CBitrixComponentTemplate
+     */
+    private $lastTemplate;
+
+    /**
      * Возвращает настроенный инстанс движка Twig
-     * @return \Twig_Environment
+     * @return TwigEnvironment
      */
     public function getEngine()
     {
@@ -43,7 +49,7 @@ class TemplateEngine
     public function __construct()
     {
         $optionsStorage = new TwigOptionsStorage();
-        $this->engine = new \Twig_Environment(
+        $this->engine = new TwigEnvironment(
             new BitrixLoader($_SERVER['DOCUMENT_ROOT']),
             $optionsStorage->asArray()
         );
@@ -77,19 +83,14 @@ class TemplateEngine
         $event = new Event('', $eventName, array($this->engine));
         $event->send();
         if ($event->getResults()) {
-
-            foreach($event->getResults() as $evenResult) {
-
-                if($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS) {
-
+            foreach ($event->getResults() as $evenResult) {
+                if ($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS) {
                     $twig = current($evenResult->getParameters());
-
-                    if (!($twig instanceof \Twig_Environment)) {
-
+                    if (!($twig instanceof TwigEnvironment)) {
                         throw new \LogicException(
-                            "Событие '{$eventName}' должно возвращать экземпляр класса '\\Twig_Environment' при успешной отработке"
+                            "Событие '{$eventName}' должно возвращать экземпляр класса ".
+                            "'\Maximaster\Tools\Twig\TwigEnvironment' при успешной отработке"
                         );
-
                     }
 
                     $this->engine = $twig;
@@ -100,8 +101,7 @@ class TemplateEngine
 
     public static function getInstance()
     {
-        if (self::$instance) return self::$instance;
-        return self::$instance = new self();
+        return self::$instance ?: (self::$instance = new self);
     }
 
     /**
@@ -125,21 +125,21 @@ class TemplateEngine
         $templateFolder,
         $parentTemplateFolder,
         $template
-    )
-    {
-        if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
-
+    ) {
+        if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
             throw new \Twig_Error('Пролог не подключен');
-
         }
 
         $component = $template->__component;
         /** @var BitrixLoader $loader */
         $loader = self::getInstance()->getEngine()->getLoader();
         if (!($loader instanceof BitrixLoader)) {
-            throw new \LogicException("Загрузчиком должен быть 'Maximaster\\Tools\\Twig\\BitrixLoader' или его наследник");
+            throw new \LogicException(
+                "Загрузчиком должен быть 'Maximaster\\Tools\\Twig\\BitrixLoader' или его наследник"
+            );
         }
 
+        self::getInstance()->lastTemplate = $template;
         $templateName = $loader->makeComponentTemplateName($template);
         echo self::getInstance()->getEngine()->render($templateName, array(
             'result' => $arResult,
@@ -152,8 +152,7 @@ class TemplateEngine
         ));
 
         $component_epilog = $templateFolder . '/component_epilog.php';
-        if(file_exists($_SERVER['DOCUMENT_ROOT'] . $component_epilog))
-        {
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . $component_epilog)) {
             /** @var \CBitrixComponent $component */
             $component->SetTemplateEpilog(array(
                 'epilogFile' => $component_epilog,
@@ -163,5 +162,14 @@ class TemplateEngine
                 'templateData' => false,
             ));
         }
+    }
+
+    /**
+     * Возвращает последний загруженный шаблон
+     * @return CBitrixComponentTemplate
+     */
+    public function getLastTemplate()
+    {
+        return $this->lastTemplate;
     }
 }
