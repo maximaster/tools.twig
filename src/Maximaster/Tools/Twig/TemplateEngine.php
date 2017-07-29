@@ -124,7 +124,7 @@ class TemplateEngine
         $arLangMessages,
         $templateFolder,
         $parentTemplateFolder,
-        $template
+        \CBitrixComponentTemplate $template
     ) {
         if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
             throw new \Twig_Error('Пролог не подключен');

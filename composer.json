@@ -11,6 +11,10 @@
     {
       "name": "Журов Михаил",
       "email": "m.zhurov@maximaster.ru"
+    },
+    {
+      "name": "Лавриненко Максим",
+      "email": "maxim.lavrinenko@maximaster.ru"
     }
   ],
   "require": {
@@ -19,8 +23,20 @@
   },
   "autoload": {
     "psr-4": {
-      "Maximaster\\": "src/Maximaster/"
+      "Maximaster\\": "src/Maximaster/",
+      "Maximaster\\Tools\\Twig\\Test\\": "tests/"
     },
     "files": ["src/Maximaster/functions.php"]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "": "tests/bitrix_mock"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.7"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
   }
 }

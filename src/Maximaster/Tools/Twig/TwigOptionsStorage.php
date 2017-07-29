@@ -32,7 +32,7 @@ class TwigOptionsStorage implements \ArrayAccess
     {
         $c = Configuration::getInstance();
         $config = $c->get('maximaster');
-        $twigConfig = (array)$config['tools']['twig'];
+        $twigConfig = isset($config['tools']['twig']) ? (array)$config['tools']['twig'] : [];
         $this->options = array_merge($this->getDefaultOptions(), $twigConfig);
         return $this->options;
     }
@@ -86,6 +86,4 @@ class TwigOptionsStorage implements \ArrayAccess
     {
         return;
     }
-
-
 }
