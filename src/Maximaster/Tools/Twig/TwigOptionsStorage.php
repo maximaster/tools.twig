@@ -24,7 +24,8 @@ class TwigOptionsStorage implements \ArrayAccess
             'charset' => SITE_CHARSET,
             'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
             'auto_reload' => isset( $_GET[ 'clear_cache' ] ) && strtoupper($_GET[ 'clear_cache' ]) == 'Y',
-            'autoescape' => false
+            'autoescape' => false,
+            'extract_result' => false,
         );
     }
 
@@ -32,7 +33,7 @@ class TwigOptionsStorage implements \ArrayAccess
     {
         $c = Configuration::getInstance();
         $config = $c->get('maximaster');
-        $twigConfig = (array)$config['tools']['twig'];
+        $twigConfig = isset($config['tools']['twig']) ? (array)$config['tools']['twig'] : array();
         $this->options = array_merge($this->getDefaultOptions(), $twigConfig);
         return $this->options;
     }
@@ -67,6 +68,17 @@ class TwigOptionsStorage implements \ArrayAccess
         return $this->options['autoescape'];
     }
 
+    public function getExtractResult()
+    {
+        return $this->options['extract_result'];
+    }
+
+    public function setExtractResult($value)
+    {
+        $this->options['extract_result'] = !! $value;
+        return $this;
+    }
+
     public function offsetExists($offset)
     {
         return isset($this->options[ $offset ]);
@@ -79,13 +91,12 @@ class TwigOptionsStorage implements \ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        return;
+        $this->options[ $offset ] = $value;
+        return $this;
     }
 
     public function offsetUnset($offset)
     {
         return;
     }
-
-
 }

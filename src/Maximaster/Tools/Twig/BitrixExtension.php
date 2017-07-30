@@ -3,7 +3,6 @@
 namespace Maximaster\Tools\Twig;
 
 use Bitrix\Main\Application;
-use Bitrix\Main\Localization\Loc;
 
 /**
  * Class BitrixExtension. Расширение, которое позволяет в шаблонах использовать типичные для битрикса конструкции

@@ -2,9 +2,10 @@
 
 namespace Maximaster\Tools\Twig;
 
-use Bitrix\Main\Config\Configuration;
 use Bitrix\Main\Event;
-use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
+use Bitrix\Main\EventResult;
+use CBitrixComponentTemplate;
+use Twig_Environment;
 
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
@@ -14,13 +15,18 @@ use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 class TemplateEngine
 {
     /**
-     * @var \Twig_Environment
+     * @var Twig_Environment
      */
     private $engine;
 
     /**
+     * @var TwigOptionsStorage
+     */
+    private $options;
+
+    /**
      * Возвращает настроенный инстанс движка Twig
-     * @return \Twig_Environment
+     * @return Twig_Environment
      */
     public function getEngine()
     {
@@ -42,10 +48,11 @@ class TemplateEngine
 
     public function __construct()
     {
-        $optionsStorage = new TwigOptionsStorage();
-        $this->engine = new \Twig_Environment(
+        $this->options = new TwigOptionsStorage();
+
+        $this->engine = new Twig_Environment(
             new BitrixLoader($_SERVER['DOCUMENT_ROOT']),
-            $optionsStorage->asArray()
+            $this->options->asArray()
         );
 
         $this->initExtensions();
@@ -77,19 +84,14 @@ class TemplateEngine
         $event = new Event('', $eventName, array($this->engine));
         $event->send();
         if ($event->getResults()) {
-
-            foreach($event->getResults() as $evenResult) {
-
-                if($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS) {
-
+            foreach ($event->getResults() as $evenResult) {
+                if ($evenResult->getType() == EventResult::SUCCESS) {
                     $twig = current($evenResult->getParameters());
-
-                    if (!($twig instanceof \Twig_Environment)) {
-
+                    if (!($twig instanceof Twig_Environment)) {
                         throw new \LogicException(
-                            "Событие '{$eventName}' должно возвращать экземпляр класса '\\Twig_Environment' при успешной отработке"
+                            "Событие '{$eventName}' должно возвращать экземпляр класса ".
+                            "'\\Twig_Environment' при успешной отработке"
                         );
-
                     }
 
                     $this->engine = $twig;
@@ -100,8 +102,7 @@ class TemplateEngine
 
     public static function getInstance()
     {
-        if (self::$instance) return self::$instance;
-        return self::$instance = new self();
+        return self::$instance ?: (self::$instance = new self);
     }
 
     /**
@@ -114,46 +115,57 @@ class TemplateEngine
      * @param array $arLangMessages
      * @param string $templateFolder
      * @param string $parentTemplateFolder
-     * @param \CBitrixComponentTemplate $template
+     * @param CBitrixComponentTemplate $template
      * @throws \Twig_Error
      */
     public static function render(
-        $templateFile,
+        /** @noinspection PhpUnusedParameterInspection */ $templateFile,
         $arResult,
         $arParams,
         $arLangMessages,
         $templateFolder,
         $parentTemplateFolder,
-        $template
-    )
-    {
-        if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
-
+        CBitrixComponentTemplate $template
+    ) {
+        if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
             throw new \Twig_Error('Пролог не подключен');
-
         }
 
         $component = $template->__component;
         /** @var BitrixLoader $loader */
         $loader = self::getInstance()->getEngine()->getLoader();
         if (!($loader instanceof BitrixLoader)) {
-            throw new \LogicException("Загрузчиком должен быть 'Maximaster\\Tools\\Twig\\BitrixLoader' или его наследник");
+            throw new \LogicException(
+                "Загрузчиком должен быть 'Maximaster\\Tools\\Twig\\BitrixLoader' или его наследник"
+            );
         }
 
         $templateName = $loader->makeComponentTemplateName($template);
-        echo self::getInstance()->getEngine()->render($templateName, array(
-            'result' => $arResult,
+
+        $engine = self::getInstance();
+        $options = $engine->getOptions();
+
+        if ($options['extract_result']) {
+            $context = $arResult;
+            $context['result'] =& $arResult;
+        } else {
+            $context = array('result' => $arResult);
+        }
+
+        $context = array(
             'params' => $arParams,
             'lang' => $arLangMessages,
             'template' => $template,
             'component' => $component,
             'templateFolder' => $templateFolder,
-            'parentTemplateFolder' => $parentTemplateFolder
-        ));
+            'parentTemplateFolder' => $parentTemplateFolder,
+            'render' => compact('templateName', 'engine'),
+        ) + $context;
+
+        echo self::getInstance()->getEngine()->render($templateName, $context);
 
         $component_epilog = $templateFolder . '/component_epilog.php';
-        if(file_exists($_SERVER['DOCUMENT_ROOT'] . $component_epilog))
-        {
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . $component_epilog)) {
             /** @var \CBitrixComponent $component */
             $component->SetTemplateEpilog(array(
                 'epilogFile' => $component_epilog,
@@ -163,5 +175,31 @@ class TemplateEngine
                 'templateData' => false,
             ));
         }
+    }
+
+    /**
+     * Рендерит произвольный twig-файл, возвращает результат в виде строки
+     * @param string $src Путь к twig-файлу
+     * @param array $context Контекст
+     * @return string Результат рендера
+     */
+    public static function renderStandalone($src, $context = array())
+    {
+        return self::getInstance()->getEngine()->render($src, $context);
+    }
+
+    /**
+     * Рендерит произвольный twig-файл, выводит результат в stdout
+     * @param string $src
+     * @param array $context
+     */
+    public static function displayStandalone($src, $context = array())
+    {
+        echo self::renderStandalone($src, $context);
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
     }
 }

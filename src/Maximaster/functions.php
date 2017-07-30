@@ -2,13 +2,7 @@
 
 use Maximaster\Tools\Twig\TemplateEngine;
 
-global $arCustomTemplateEngines;
-$arCustomTemplateEngines['twig'] = array(
-    'templateExt' => array('twig'),
-    'function'    => 'maximasterRenderTwigTemplate'
-);
-if (!function_exists('maximasterRenderTwigTemplate'))
-{
+if (!function_exists('maximasterRenderTwigTemplate')) {
     function maximasterRenderTwigTemplate(
         $templateFile,
         $arResult,
@@ -28,8 +22,17 @@ if (!function_exists('maximasterRenderTwigTemplate'))
             $template
         );
     }
-}
-else
-{
+
+    function maximasterRegisterTwigTemplateEngine()
+    {
+        global $arCustomTemplateEngines;
+        $arCustomTemplateEngines['twig'] = array(
+            'templateExt' => array('twig'),
+            'function'    => 'maximasterRenderTwigTemplate'
+        );
+    }
+
+    maximasterRegisterTwigTemplateEngine();
+} else {
     throw new \Twig_Error_Loader('Необходимо, чтобы функция с именем maximasterRenderTwigTemplate не была определена');
 }

@@ -2,11 +2,16 @@
 
 namespace Maximaster\Tools\Twig;
 
+use Twig\Template;
+use Twig_Error_Loader;
+use Twig_Loader_Filesystem;
+use Twig_LoaderInterface;
+
 /**
  * Class BitrixLoader. Класс загрузчик файлов шаблонов. Понимает специализированный синтаксис
  * @package Maximaster\Twig
  */
-class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterface
+class BitrixLoader extends Twig_Loader_Filesystem implements Twig_LoaderInterface
 {
     /** @var array Статическое хранилище для уже отрезолвленных путей для ускорения */
     private static $resolved = array();
@@ -67,19 +72,33 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
         }
 
         $resolved = '';
-        $realFileName = $_SERVER['DOCUMENT_ROOT'] . $name;
-        if (file_exists($realFileName)) {
-            $resolved = $realFileName;
-        } else {
+        if (strpos($name, ':') !== false) {
             $resolved = $this->getComponentTemplatePath($name);
+        } elseif (($firstChar = substr($name, 0, 1)) === DIRECTORY_SEPARATOR) {
+            $resolved = is_file($name) ? $name : $_SERVER['DOCUMENT_ROOT'].$name;
         }
 
-        static::$resolved[ $name ] = $resolved;
+        if (!file_exists($resolved)) {
+            throw new Twig_Error_Loader("Не удалось найти шаблон '{$name}'");
+        }
 
-        return $resolved;
-
+        return static::$resolved[ $name ] = $resolved;
     }
 
+    protected function getLastRenderedTemplate()
+    {
+        $trace = debug_backtrace();
+        foreach ($trace as $point) {
+            if (isset($point['object']) && ($obj = $point['object']) instanceof Template) {
+                /**
+                 * @var Template $obj
+                 */
+                return $obj->getSourceContext()->getPath();
+            }
+        }
+
+        return false;
+    }
 
     /**
      * По Битрикс-имени шаблона возвращает путь к его файлу
@@ -92,21 +111,33 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
     {
         $name = $this->normalizeName($name);
 
-        list($namespace, $component, $template, $file) = explode(':', $name);
+        list($namespace, $component, $template, $page) = explode(':', $name);
+
+        // Относительный путь, например: vendor:component:template:inc/area.twig
+        $isRelative = $page !== basename($page);
+
+        $dotExt = '.twig';
+        if ($isRelative) {
+            if (pathinfo($page, PATHINFO_EXTENSION) !== 'twig') {
+                $page .= $dotExt;
+            }
+        } else {
+            $page = basename($page, $dotExt);
+        }
 
         $componentName = "{$namespace}:{$component}";
 
         $component = new \CBitrixComponent();
         $component->InitComponent($componentName, $template);
-        $component->__templatePage = $file;
+        if (!$isRelative) {
+            $component->__templatePage = $page;
+        }
 
         $obTemplate = new \CBitrixComponentTemplate();
         $obTemplate->Init($component);
-        $templatePath = $_SERVER['DOCUMENT_ROOT'] . $obTemplate->GetFile();
-
-        if (!file_exists($templatePath)) {
-            throw new \Twig_Error_Loader("Не удалось найти шаблон '{$name}'");
-        }
+        $templatePath = $_SERVER['DOCUMENT_ROOT'].(
+            $isRelative ? ($obTemplate->GetFolder().DIRECTORY_SEPARATOR.$page) : $obTemplate->GetFile()
+        );
 
         return $templatePath;
     }
@@ -138,30 +169,40 @@ class BitrixLoader extends \Twig_Loader_Filesystem implements \Twig_LoaderInterf
      */
     public function normalizeName($name)
     {
-        if (strpos($name, '/') !== false) {
-            return parent::normalizeName($name);
+        if (strpos($name, DIRECTORY_SEPARATOR) !== false) {
+            $name = parent::normalizeName($name);
         }
 
-        if (isset(static::$normalized[ $name ])) {
+        $isComponentPath = strpos($name, ':') !== false;
+        $isGlobalPath = substr($name, 0, 1) === '/';
+
+        if (($isComponentPath || $isGlobalPath) && isset(static::$normalized[ $name ])) {
             return static::$normalized[ $name ];
         }
 
-        //Убираем все повторяющиеся двоеточия
-        $name = preg_replace('#/{2,}#', ':', (string)$name);
+        if ($isComponentPath) {
+            list($namespace, $component, $template, $file) = explode(':', $name);
 
-        list( $namespace, $component, $template, $file ) = explode(':', $name);
+            if (strlen($template) === 0) {
+                $template = '.default';
+            }
 
-        if (strlen($template) === 0) {
-            $template = '.default';
+            if (strlen($file) === 0) {
+                $file = 'template';
+            }
+
+            $normalizedName = "{$namespace}:{$component}:{$template}:{$file}";
+        } elseif ($isGlobalPath) {
+            $normalizedName = $name;
+        } else {
+            $lastRendered = $this->getLastRenderedTemplate();
+            if ($lastRendered) {
+                $normalizedName = dirname($lastRendered).'/'.$name;
+            } else {
+                $normalizedName = $name;
+            }
         }
 
-        if (strlen($file) === 0) {
-            $file = 'template';
-        }
-
-        $normalizedName = "{$namespace}:{$component}:{$template}:{$file}";
-        static::$normalized[ $name ] = $normalizedName;
-        return $normalizedName;
-
+        return (static::$normalized[ $name ] = $normalizedName);
     }
 }
