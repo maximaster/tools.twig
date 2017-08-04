@@ -6,6 +6,7 @@ use Bitrix\Main\Event;
 use Bitrix\Main\EventResult;
 use CBitrixComponentTemplate;
 use Twig_Environment;
+use Bitrix\Main\Localization\Loc;
 
 /**
  * Class TemplateEngine. Небольшой синглтон, который позволяет в процессе работы страницы несколько раз обращаться к
@@ -150,6 +151,20 @@ class TemplateEngine
             $context['result'] =& $arResult;
         } else {
             $context = array('result' => $arResult);
+        }
+
+        // Битрикс не умеет "лениво" грузить языковые сообщения если они запрашиваются из twig, т.к. ищет вызов
+        // GetMessage, а после ищет рядом lang-папки. Т.к. рядом с кешем их конечно нет
+        // Кроме того, Битрикс ждёт такое же имя файла, внутри lang-папки. Т.е. например template.twig
+        // Но сам includ'ит их, что в случае twig файла конечно никак не сработает. Поэтому подменяем имя
+        $templateMess = Loc::loadLanguageFile(
+            $_SERVER['DOCUMENT_ROOT'].preg_replace('/[.]twig$/', '.php', $template->GetFile())
+        );
+
+        // Это не обязательно делать если не используется lang, т.к. Битрикс загруженные фразы все равно запомнил
+        // и они будут доступны через вызов getMessage в шаблоне. После удаления lang, можно удалить и этот код
+        if (is_array($templateMess)) {
+            $arLangMessages = array_merge($arLangMessages, $templateMess);
         }
 
         $context = array(
