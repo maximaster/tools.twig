@@ -28,13 +28,18 @@
     },
     "files": ["src/Maximaster/functions.php"]
   },
-  "autoload-dev": {
-    "psr-4": {
-      "": "tests/bitrix_mock"
-    }
-  },
   "require-dev": {
-    "phpunit/phpunit": "^5.7"
+    "phpunit/phpunit": "^5.7",
+    "goaop/framework": "dev-autoload_unregister_bugfix"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/mlavrinenko/framework"
+    }
+  ],
+  "suggest": {
+    "goaop/framework": "Для того чтобы использовать twig-шаблоны для стандартных компонент работающих в ajax-режиме, необходимо подключить доп. зависимость. Требуется специальная исправленная версия (https://github.com/mlavrinenko/framework#dev-autoload_unregister_bugfix) и php 5.6+"
   },
   "scripts": {
     "test": "vendor/bin/phpunit"

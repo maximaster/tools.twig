@@ -1,6 +1,7 @@
 <?php
 
 use Maximaster\Tools\Twig\TemplateEngine;
+use Maximaster\Tools\Twig\Aop\AspectKernel;
 
 if (!function_exists('maximasterRenderTwigTemplate')) {
     function maximasterRenderTwigTemplate(
@@ -33,6 +34,14 @@ if (!function_exists('maximasterRenderTwigTemplate')) {
     }
 
     maximasterRegisterTwigTemplateEngine();
+
+    if (class_exists('\Go\Core\AspectKernel', true)) {
+        $aspectKernel = AspectKernel::getInstance();
+        $aspectKernel->init(array(
+            'appDir' => $_SERVER['DOCUMENT_ROOT'],
+            'cacheDir' => TemplateEngine::getInstance()->getOptions()->getCache(),
+        ));
+    }
 } else {
     throw new \Twig_Error_Loader('Необходимо, чтобы функция с именем maximasterRenderTwigTemplate не была определена');
 }
