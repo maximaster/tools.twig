@@ -35,7 +35,7 @@ if (!function_exists('maximasterRenderTwigTemplate')) {
 
     maximasterRegisterTwigTemplateEngine();
 
-    if (class_exists('\Go\Core\AspectKernel', true)) {
+    if (class_exists('\Go\Core\AspectKernel', true) && class_exists('CMain')) {
         $aspectKernel = AspectKernel::getInstance();
         $aspectKernel->init(array(
             'appDir' => $_SERVER['DOCUMENT_ROOT'],
