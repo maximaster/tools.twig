@@ -3,15 +3,15 @@
 namespace Maximaster\Tools\Twig;
 
 use Twig\Template;
-use Twig_Error_Loader;
-use Twig_Loader_Filesystem;
-use Twig_LoaderInterface;
+use Twig\Error\LoaderError as TwigLoaderError;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
+use Twig\Loader\LoaderInterface as TwigLoaderInterface;
 
 /**
  * Class BitrixLoader. Класс загрузчик файлов шаблонов. Понимает специализированный синтаксис
  * @package Maximaster\Twig
  */
-class BitrixLoader extends Twig_Loader_Filesystem implements Twig_LoaderInterface
+class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
 {
     /** @var array Статическое хранилище для уже отрезолвленных путей для ускорения */
     private static $resolved = array();
@@ -61,7 +61,7 @@ class BitrixLoader extends Twig_Loader_Filesystem implements Twig_LoaderInterfac
      *
      * @param string $name
      * @return string
-     * @throws \Twig_Error_Loader
+     * @throws Twig\Error\LoaderError
      */
     public function getSourcePath($name)
     {
@@ -79,7 +79,7 @@ class BitrixLoader extends Twig_Loader_Filesystem implements Twig_LoaderInterfac
         }
 
         if (!file_exists($resolved)) {
-            throw new Twig_Error_Loader("Не удалось найти шаблон '{$name}'");
+            throw new TwigLoaderError("Не удалось найти шаблон '{$name}'");
         }
 
         return static::$resolved[ $name ] = $resolved;
@@ -105,7 +105,7 @@ class BitrixLoader extends Twig_Loader_Filesystem implements Twig_LoaderInterfac
      *
      * @param string $name
      * @return string
-     * @throws \Twig_Error_Loader
+     * @throws Twig\Error\LoaderError
      */
     private function getComponentTemplatePath($name)
     {

@@ -2,7 +2,10 @@
 
 namespace Maximaster\Tools\Twig;
 
-class CustomFunctionsExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
+use Twig\TwigFunction;
+
+class CustomFunctionsExtension extends TwigAbstractExtension
 {
     public function getName()
     {
@@ -17,7 +20,7 @@ class CustomFunctionsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('russianPluralForm', array($this, 'russianPluralForm')),
+            new TwigFunction('russianPluralForm', array($this, 'russianPluralForm')),
         );
     }
 

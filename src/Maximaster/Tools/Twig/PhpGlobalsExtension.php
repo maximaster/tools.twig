@@ -2,13 +2,14 @@
 
 namespace Maximaster\Tools\Twig;
 
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
 
 /**
  * Class BitrixExtension. Расширение, которое добавляет глобалки php в шаблоны
  *
  * @package Maximaster\Twig
  */
-class PhpGlobalsExtension extends \Twig_Extension
+class PhpGlobalsExtension extends TwigAbstractExtension
 {
     public function getName()
     {

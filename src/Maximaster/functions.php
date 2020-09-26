@@ -2,6 +2,7 @@
 
 use Maximaster\Tools\Twig\TemplateEngine;
 use Maximaster\Tools\Twig\Aop\AspectKernel;
+use Twig\Error\LoaderError as TwigLoaderError;
 
 if (!function_exists('maximasterRenderTwigTemplate')) {
     function maximasterRenderTwigTemplate(
@@ -43,5 +44,5 @@ if (!function_exists('maximasterRenderTwigTemplate')) {
         ));
     }
 } else {
-    throw new \Twig_Error_Loader('Необходимо, чтобы функция с именем maximasterRenderTwigTemplate не была определена');
+    throw new TwigLoaderError('Необходимо, чтобы функция с именем maximasterRenderTwigTemplate не была определена');
 }
