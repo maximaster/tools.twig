@@ -38,7 +38,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
     }
 
     /** {@inheritdoc} */
-    public function getCacheKey($name)
+    public function getCacheKey(string $name): string
     {
         return $this->normalizeName($name);
     }
@@ -51,7 +51,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
      * @param int    $time Время изменения закешированного шаблона
      * @return bool Актуален ли закешированный шаблон
      */
-    public function isFresh($name, $time)
+    public function isFresh(string $name, int $time): bool
     {
         return filemtime($this->getSourcePath($name)) <= $time;
     }
