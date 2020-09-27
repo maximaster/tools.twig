@@ -25,10 +25,11 @@ class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterf
     {
         global $APPLICATION, $USER;
 
-        $coreVariables = array(
-            'APPLICATION'   => $APPLICATION,
-            'USER'          => $USER,
-        );
+        $coreVariables = [
+            'APPLICATION'        => $APPLICATION,
+            'USER'               => $USER,
+            'SITE_TEMPLATE_PATH' => SITE_TEMPLATE_PATH,
+        ];
 
         if ($this->isD7()) {
             $coreVariables['app'] = Application::getInstance();
