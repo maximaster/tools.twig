@@ -4,6 +4,7 @@ namespace Maximaster\Tools\Twig;
 
 use Bitrix\Main\Application;
 use Twig\Extension\AbstractExtension as TwigAbstractExtension;
+use Twig\Extension\GlobalsInterface as TwigGlobalsInterface;
 use Twig\TwigFunction;
 
 /**
@@ -11,7 +12,7 @@ use Twig\TwigFunction;
  *
  * @package Maximaster\Twig
  */
-class BitrixExtension extends TwigAbstractExtension
+class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterface
 {
     private $isD7 = null;
 
@@ -20,7 +21,7 @@ class BitrixExtension extends TwigAbstractExtension
         return 'bitrix_extension';
     }
 
-    public function getGlobals()
+    public function getGlobals(): array
     {
         global $APPLICATION, $USER;
 

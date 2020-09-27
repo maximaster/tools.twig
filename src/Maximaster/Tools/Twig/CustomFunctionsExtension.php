@@ -4,15 +4,16 @@ namespace Maximaster\Tools\Twig;
 
 use Twig\Extension\AbstractExtension as TwigAbstractExtension;
 use Twig\TwigFunction;
+use Twig\Extension\GlobalsInterface as TwigGlobalsInterface;
 
-class CustomFunctionsExtension extends TwigAbstractExtension
+class CustomFunctionsExtension extends TwigAbstractExtension implements TwigGlobalsInterface
 {
     public function getName()
     {
         return 'maximaster_functions_extension';
     }
 
-    public function getGlobals()
+    public function getGlobals(): array
     {
         return array();
     }
