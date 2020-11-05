@@ -170,7 +170,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
     public function normalizeName($name)
     {
         if (strpos($name, DIRECTORY_SEPARATOR) !== false) {
-            $name = parent::normalizeName($name);
+            $name = preg_replace('#/{2,}#', '/', str_replace('\\', '/', $name));
         }
 
         $isComponentPath = strpos($name, ':') !== false;
