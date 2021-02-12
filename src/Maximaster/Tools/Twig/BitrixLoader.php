@@ -66,7 +66,7 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
     public function getSourcePath($name)
     {
         $name = $this->normalizeName($name);
-        
+
         if (isset(static::$resolved[ $name ])) {
             return static::$resolved[ $name ];
         }
@@ -154,9 +154,15 @@ class BitrixLoader extends TwigFilesystemLoader implements TwigLoaderInterface
             return $template->__fileAlt;
         }
 
+        $component = $template->getComponent();
+
+        if (!empty($component->getParent())) {
+            return $template->__file;
+        }
+
         $templatePage = $template->__page;
         $templateName = $template->__name;
-        $componentName = $template->__component->getName();
+        $componentName = $component->getName();
 
         return "{$componentName}:{$templateName}:{$templatePage}";
     }
