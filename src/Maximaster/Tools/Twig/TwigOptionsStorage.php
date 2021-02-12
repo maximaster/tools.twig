@@ -17,19 +17,20 @@ class TwigOptionsStorage implements \ArrayAccess
         $this->getOptions();
     }
 
-    public function getDefaultOptions()
+    public function getDefaultOptions(): array
     {
         return array(
             'debug' => false,
             'charset' => SITE_CHARSET,
             'cache' => $_SERVER['DOCUMENT_ROOT'] . '/bitrix/cache/maximaster/tools.twig',
-            'auto_reload' => isset( $_GET[ 'clear_cache' ] ) && strtoupper($_GET[ 'clear_cache' ]) == 'Y',
+            'auto_reload' => isset($_GET['clear_cache']) && strtoupper($_GET['clear_cache']) == 'Y',
             'autoescape' => false,
             'extract_result' => false,
+            'use_by_default' => false
         );
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
         $c = Configuration::getInstance();
         $config = $c->get('maximaster');
@@ -38,65 +39,67 @@ class TwigOptionsStorage implements \ArrayAccess
         return $this->options;
     }
 
-    public function asArray()
+    public function asArray(): array
     {
         return $this->options;
     }
 
-    public function getCache()
+    public function getCache(): string
     {
-        return $this->options['cache'];
+        return (string)$this->options['cache'];
     }
 
-    public function getDebug()
+    public function getDebug(): bool
     {
-        return $this->options['debug'];
+        return (bool)$this->options['debug'];
     }
 
-    public function getCharset()
+    public function getCharset(): string
     {
-        return $this->options['charset'];
+        return (string)$this->options['charset'];
     }
 
-    public function getAutoReload()
+    public function getAutoReload(): bool
     {
-        return $this->options['auto_reload'];
+        return (bool)$this->options['auto_reload'];
     }
 
-    public function getAutoescape()
+    public function getAutoescape(): bool
     {
-        return $this->options['autoescape'];
+        return (bool)$this->options['autoescape'];
     }
 
-    public function getExtractResult()
+    public function getExtractResult(): bool
     {
-        return $this->options['extract_result'];
+        return (bool)$this->options['extract_result'];
     }
 
-    public function setExtractResult($value)
+    public function getUsedByDefault(): bool
+    {
+        return (bool)$this->options['use_by_default'];
+    }
+
+    public function setExtractResult($value): TwigOptionsStorage
     {
         $this->options['extract_result'] = !! $value;
         return $this;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
-        return isset($this->options[ $offset ]);
+        return isset($this->options[$offset]);
     }
 
     public function offsetGet($offset)
     {
-        return $this->options[ $offset ];
+        return $this->options[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): TwigOptionsStorage
     {
         $this->options[ $offset ] = $value;
         return $this;
     }
 
-    public function offsetUnset($offset)
-    {
-        return;
-    }
+    public function offsetUnset($offset) {}
 }
