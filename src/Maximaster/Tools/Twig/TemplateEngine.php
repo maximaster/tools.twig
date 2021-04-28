@@ -5,7 +5,9 @@ namespace Maximaster\Tools\Twig;
 use Bitrix\Main\Event;
 use Bitrix\Main\EventResult;
 use CBitrixComponentTemplate;
-use Twig_Environment;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extension\DebugExtension as TwigDebugExtension;
+use Twig\Error\Error as TwigError;
 use Bitrix\Main\Localization\Loc;
 
 /**
@@ -16,7 +18,7 @@ use Bitrix\Main\Localization\Loc;
 class TemplateEngine
 {
     /**
-     * @var Twig_Environment
+     * @var Twig\Environment
      */
     private $engine;
 
@@ -27,7 +29,7 @@ class TemplateEngine
 
     /**
      * Возвращает настроенный инстанс движка Twig
-     * @return Twig_Environment
+     * @return Twig\Environment
      */
     public function getEngine()
     {
@@ -51,7 +53,7 @@ class TemplateEngine
     {
         $this->options = new TwigOptionsStorage();
 
-        $this->engine = new Twig_Environment(
+        $this->engine = new TwigEnvironment(
             new BitrixLoader($_SERVER['DOCUMENT_ROOT']),
             $this->options->asArray()
         );
@@ -68,7 +70,7 @@ class TemplateEngine
     private function initExtensions()
     {
         if ($this->engine->isDebug()) {
-            $this->engine->addExtension(new \Twig_Extension_Debug());
+            $this->engine->addExtension(new TwigDebugExtension());
         }
 
         $this->engine->addExtension(new BitrixExtension());
@@ -82,16 +84,16 @@ class TemplateEngine
     private function generateInitEvent()
     {
         $eventName = 'onAfterTwigTemplateEngineInited';
-        $event = new Event('', $eventName, array($this->engine));
+        $event = new Event('', $eventName, array('engine' => $this->engine));
         $event->send();
         if ($event->getResults()) {
             foreach ($event->getResults() as $evenResult) {
                 if ($evenResult->getType() == EventResult::SUCCESS) {
                     $twig = current($evenResult->getParameters());
-                    if (!($twig instanceof Twig_Environment)) {
+                    if (!($twig instanceof TwigEnvironment)) {
                         throw new \LogicException(
                             "Событие '{$eventName}' должно возвращать экземпляр класса ".
-                            "'\\Twig_Environment' при успешной отработке"
+                            "'\\TwigEnvironment' при успешной отработке"
                         );
                     }
 
@@ -117,7 +119,7 @@ class TemplateEngine
      * @param string $templateFolder
      * @param string $parentTemplateFolder
      * @param CBitrixComponentTemplate $template
-     * @throws \Twig_Error
+     * @throws Twig\Error\Error
      */
     public static function render(
         /** @noinspection PhpUnusedParameterInspection */ $templateFile,
@@ -129,7 +131,7 @@ class TemplateEngine
         CBitrixComponentTemplate $template
     ) {
         if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) {
-            throw new \Twig_Error('Пролог не подключен');
+            throw new TwigError('Пролог не подключен');
         }
 
         $component = $template->__component;

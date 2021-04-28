@@ -52,7 +52,7 @@ class FixAjaxComponentAspect implements Aspect
     {
         $foundTrace = false;
         foreach (debug_backtrace() as $trace) {
-            if ($trace['class'] == 'Twig_Template') {
+            if ($trace['class'] == 'Twig\\Template') {
                 $foundTrace = $trace;
                 break;
             }

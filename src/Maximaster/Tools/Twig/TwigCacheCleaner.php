@@ -3,6 +3,7 @@
 namespace Maximaster\Tools\Twig;
 
 use Bitrix\Main\ArgumentException;
+use Twig\Environment as TwigEnvironment;
 
 /**
  * Класс, который берет на себя очистку кеша твига
@@ -12,7 +13,7 @@ class TwigCacheCleaner
 {
     protected $engine;
 
-    public function __construct(\Twig_Environment $engine)
+    public function __construct(TwigEnvironment $engine)
     {
         $this->engine = $engine;
         $this->checkCacheEngine();

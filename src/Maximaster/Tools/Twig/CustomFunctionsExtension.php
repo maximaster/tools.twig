@@ -2,14 +2,18 @@
 
 namespace Maximaster\Tools\Twig;
 
-class CustomFunctionsExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
+use Twig\TwigFunction;
+use Twig\Extension\GlobalsInterface as TwigGlobalsInterface;
+
+class CustomFunctionsExtension extends TwigAbstractExtension implements TwigGlobalsInterface
 {
     public function getName()
     {
         return 'maximaster_functions_extension';
     }
 
-    public function getGlobals()
+    public function getGlobals(): array
     {
         return array();
     }
@@ -17,7 +21,7 @@ class CustomFunctionsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('russianPluralForm', array($this, 'russianPluralForm')),
+            new TwigFunction('russianPluralForm', array($this, 'russianPluralForm')),
         );
     }
 

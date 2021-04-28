@@ -3,13 +3,16 @@
 namespace Maximaster\Tools\Twig;
 
 use Bitrix\Main\Application;
+use Twig\Extension\AbstractExtension as TwigAbstractExtension;
+use Twig\Extension\GlobalsInterface as TwigGlobalsInterface;
+use Twig\TwigFunction;
 
 /**
  * Class BitrixExtension. Расширение, которое позволяет в шаблонах использовать типичные для битрикса конструкции
  *
  * @package Maximaster\Twig
  */
-class BitrixExtension extends \Twig_Extension
+class BitrixExtension extends TwigAbstractExtension implements TwigGlobalsInterface
 {
     private $isD7 = null;
 
@@ -18,14 +21,15 @@ class BitrixExtension extends \Twig_Extension
         return 'bitrix_extension';
     }
 
-    public function getGlobals()
+    public function getGlobals(): array
     {
         global $APPLICATION, $USER;
 
-        $coreVariables = array(
-            'APPLICATION'   => $APPLICATION,
-            'USER'          => $USER,
-        );
+        $coreVariables = [
+            'APPLICATION'        => $APPLICATION,
+            'USER'               => $USER,
+            'SITE_TEMPLATE_PATH' => SITE_TEMPLATE_PATH,
+        ];
 
         if ($this->isD7()) {
             $coreVariables['app'] = Application::getInstance();
@@ -45,18 +49,18 @@ class BitrixExtension extends \Twig_Extension
     }
 
     /**
-     * @return \Twig_SimpleFunction[]
+     * @return TwigFunction[]
      */
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('showError', 'ShowError'),
-            new \Twig_SimpleFunction('showMessage', 'ShowMessage'),
-            new \Twig_SimpleFunction('showNote', 'ShowNote'),
-            new \Twig_SimpleFunction('bitrix_sessid_post', 'bitrix_sessid_post'),
-            new \Twig_SimpleFunction('bitrix_sessid_get', 'bitrix_sessid_get'),
-            new \Twig_SimpleFunction('getMessage', $this->isD7() ? '\\Bitrix\\Main\\Localization\\Loc::getMessage' : 'GetMessage'),
-            new \Twig_SimpleFunction('showComponent', array(__CLASS__, 'showComponent')),
+            new TwigFunction('showError', 'ShowError'),
+            new TwigFunction('showMessage', 'ShowMessage'),
+            new TwigFunction('showNote', 'ShowNote'),
+            new TwigFunction('bitrix_sessid_post', 'bitrix_sessid_post'),
+            new TwigFunction('bitrix_sessid_get', 'bitrix_sessid_get'),
+            new TwigFunction('getMessage', $this->isD7() ? '\\Bitrix\\Main\\Localization\\Loc::getMessage' : 'GetMessage'),
+            new TwigFunction('showComponent', array(__CLASS__, 'showComponent')),
         );
     }
 
